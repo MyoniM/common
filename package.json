@@ -1,5 +1,5 @@
 {
-  "name": "@cygnetops/common-v2",
+  "name": "@ymtick/common",
   "version": "1.0.0",
   "description": "",
   "main": "./build/index.js",
