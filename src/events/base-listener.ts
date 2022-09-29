@@ -6,7 +6,7 @@ interface Event {
   data: any;
 }
 
-export abstract class Subscriber<T extends Event> {
+export abstract class Listener<T extends Event> {
   abstract subject: T['subject'];
   abstract queueGroupName: string;
   abstract onMessage(data: T['data'], msg: Message): void;
@@ -26,10 +26,15 @@ export abstract class Subscriber<T extends Event> {
       .setDurableName(this.queueGroupName);
   }
 
-  subscribe() {
-    const subscription = this.client.subscribe(this.subject, this.queueGroupName, this.subscriptionOptions());
+  listen() {
+    const subscription = this.client.subscribe(
+      this.subject,
+      this.queueGroupName,
+      this.subscriptionOptions()
+    );
+
     subscription.on('message', (msg: Message) => {
-      console.log(`Message ${msg.getSequence()} received: ${this.subject} / ${this.queueGroupName}`);
+      console.log(`Message received: ${this.subject} / ${this.queueGroupName}`);
 
       const parsedData = this.parseMessage(msg);
       this.onMessage(parsedData, msg);
@@ -38,6 +43,8 @@ export abstract class Subscriber<T extends Event> {
 
   parseMessage(msg: Message) {
     const data = msg.getData();
-    return typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString('utf-8'));
+    return typeof data === 'string'
+      ? JSON.parse(data)
+      : JSON.parse(data.toString('utf8'));
   }
 }
